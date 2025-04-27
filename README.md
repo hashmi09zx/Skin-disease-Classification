@@ -43,7 +43,7 @@ skin-cancer-detection/
 
 📊 Model Performance
 
-![Model Evaluation](static\images\model_evaluation_table.png)
+![Model Evaluation](static/images/model_evaluation_table.png)
 ✅ The model shows strong generalization with high top-2 and top-3 accuracies, suitable for real-world applications!
 
 
@@ -63,10 +63,9 @@ cd Skin-disease-Classification
 
 📷 Demo Screenshots
 
-![Demo Image](static\images\demo.png)
+![Demo Image](static/images/demo.png)
 
-![Prediction Image](static\images\image.png)
-
+![Prediction Image](static/images/image.png)
 
 ✨ Future Improvements
 1. Improve classification accuracy with further fine-tuning.
