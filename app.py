@@ -6,24 +6,9 @@ import io
 
 app = Flask(__name__)
 
-
-# Define custom metrics again (must match what you used during model training)
-from tensorflow.keras.metrics import top_k_categorical_accuracy
-
-def top_2_accuracy(y_true, y_pred):
-    return top_k_categorical_accuracy(y_true, y_pred, k=2)
-
-def top_3_accuracy(y_true, y_pred):
-    return top_k_categorical_accuracy(y_true, y_pred, k=3)
-
-# Load the model
-model = tf.keras.models.load_model(
-    'mobilenet_skin_model_final.keras',
-    custom_objects={
-        'top_2_accuracy': top_2_accuracy,
-        'top_3_accuracy': top_3_accuracy
-    }
-)
+# Load the TFLite model
+interpreter = tf.lite.Interpreter(model_path='mobilenet_skin_model_final.tflite')
+interpreter.allocate_tensors()
 
 # Class names
 CLASS_NAMES = ['akiec', 'bcc', 'bkl', 'df', 'mel', 'nv', 'vasc']
@@ -119,7 +104,19 @@ def predict():
     try:
         image_bytes = file.read()
         image = prepare_image(image_bytes)
-        predictions = model.predict(image)
+        
+        # Prepare input tensor for TFLite model
+        input_details = interpreter.get_input_details()
+        output_details = interpreter.get_output_details()
+
+        # Set the input tensor
+        interpreter.set_tensor(input_details[0]['index'], image)
+        
+        # Run inference
+        interpreter.invoke()
+
+        # Get the output tensor
+        predictions = interpreter.get_tensor(output_details[0]['index'])
         predicted_class_idx = np.argmax(predictions, axis=1)[0]
         confidence = np.max(tf.nn.softmax(predictions))
         
